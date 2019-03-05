@@ -2,8 +2,11 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true});
+var campground = require("./models/campground");
+var seedDB = require("./seeds");
 
+seedDB();
+mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 var port = 3000;
@@ -12,13 +15,9 @@ app.listen(port, function(){
     console.log("Yelpcamp Server Is Running!");
 });
 
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
 
-var campground = mongoose.model("campground", campgroundSchema);
+
+
 
 // campground.create({
 //     name: "Granite Hill",
