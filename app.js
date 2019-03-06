@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var campground = require("./models/campground");
+var comment = require("./models/comment");
 var seedDB = require("./seeds");
 
 seedDB();
@@ -16,24 +17,6 @@ app.listen(port, function(){
 });
 
 
-
-
-
-// campground.create({
-//     name: "Granite Hill",
-//     image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
-//     description: "This is a huge granite hill, no bathrooms. No water. Beautiful granite!"
-//     },
-//     function(err, campground){
-//         if(err){
-//             console.log(err);
-//         } else {
-//             console.log("NEWLY CREATED CAMPGROUND: ");
-//             console.log(campground);
-//         }
-//     });
-
-
 app.get("/", function(req, res){
     res.render("landing");
 });
@@ -43,7 +26,7 @@ app.get("/campgrounds", function(req, res){
         if(err){
             console.log(err);
         } else {
-            res.render("campgrounds", {campgrounds: campgrounds});
+            res.render("campgrounds/campgrounds", {campgrounds: campgrounds});
         }
     });    
 });
@@ -63,15 +46,45 @@ app.post("/campgrounds", function(req, res){
 });
 
 app.get("/campgrounds/new", function(req, res){
-    res.render("new.ejs");
+    res.render("campgrounds/new");
 });
 
 app.get("/campgrounds/:id", function(req, res){
-    campground.findById(req.params.id, function(err, foundCampground){
+    campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
             console.log(err);
         } else {
-            res.render("show", {campground: foundCampground});
+            res.render("campgrounds/show", {campground: foundCampground});
         }
     });
 });
+
+app.get("/campgrounds/:id/comments/new", function(req, res){
+    campground.findById(req.params.id, function(err, campground){
+        if(err){
+            console.log(err);
+        } else {
+            res.render("comments/new", {campground: campground});
+        }
+    });
+});
+
+app.post("/campgrounds/:id/comments", function(req, res){
+    campground.findById(req.params.id, function(err, campground){
+        if(err){
+            console.log(err);
+            res.redirect("/campgrounds");
+        } else {
+            comment.create(req.body.comment, function(err, comment){
+                if(err){
+                    console.log(err);
+                } else {
+                    campground.comments.push(comment);
+                    campground.save();
+                    res.redirect('/campgrounds/' + campground._id);
+                }
+            });
+        }
+    });
+});
+
