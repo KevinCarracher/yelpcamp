@@ -115,11 +115,18 @@ app.post("/register", function(req, res){
     var newUser = new user({username: req.body.username});
     user.register(newUser, req.body.password, function(err, user){
         if(err){
-            console.log(rr);
+            console.log(err);
             return res.render("register");
         }
         passport.authenticate("local")(req, res, function(){
             res.redirect("/campgrounds");
         });
     });
+});
+
+app.get("/login", function(req, res){
+    res.render("login");
+});
+
+app.post("/login", passport.authenticate("local", {successRedirect: "/campgrounds", failureRedirect: "/login"}), function(req, res){
 });
