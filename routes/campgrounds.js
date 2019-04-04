@@ -70,6 +70,17 @@ router.put("/:id", function(req, res){
     });
 });
 
+//Delete campground
+router.delete("/:id", function(req, res){
+    campground.findByIdAndRemove(req.params.id, function(err){
+        if(err){
+            res.redirect("/campgrounds");
+        } else {
+            res.redirect("/campgrounds");
+        }
+    });
+});
+
 //Middleware
 function isLoggedIn(req, res, next){
     if(req.isAuthenticated()){
