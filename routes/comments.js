@@ -7,7 +7,7 @@ var middleware = require("../middleware");
 //Comments new
 router.get("/new", middleware.isLoggedIn, function(req, res){
     campground.findById(req.params.id, function(err, campground){
-        if(err || !foundCampground){
+        if(err){
             req.flash("error", "Campground not found");
             res.redirect("back");
         } else {
